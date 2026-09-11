@@ -1,0 +1,21 @@
+header {
+  min-height: 80dvh;
+}
+header .carousel-indicators {
+  bottom: -100px;
+}
+header .carousel-indicators button[data-bs-target] {
+  width: 10px;
+  height: 10px;
+  border-radius: 100%;
+}
+header .carousel-indicators button[data-bs-target].active {
+  background-color: #BE8C3E;
+}
+header .carousel-item .row .item img {
+  width: 500px;
+  height: 350px;
+  margin: auto;
+}
+
+/*# sourceMappingURL=index.css.map */

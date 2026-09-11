@@ -1,0 +1,408 @@
+@use "../../../shared/styles/global/scss/mixins" as *;
+
+.content {
+
+    .part1 {
+        &>.item {
+            @include responsive(350) {
+                width: 320px;
+                margin: auto;
+            }
+
+            @include responsive(1250) {
+                width: 310px;
+                margin: auto;
+            }
+
+            .body,
+            .head {
+                i {
+                    color: #2c2013;
+                    cursor: pointer;
+                    font-weight: 700;
+                }
+            }
+        }
+    }
+
+    .part2 {
+        &>.item {
+            background-color: #212c3a;
+            border: 1px solid #f3e8d2;
+            border-radius: 10px;
+
+            @include responsive(1050) {
+                width: 680px;
+                margin-left: auto;
+            }
+
+            @include responsive(1050) {
+                width: initial;
+                margin-left: initial;
+            }
+
+            .statistics {
+                .state {
+                    background-color: #f3e8d2;
+                    color: #2c2013;
+                    border-radius: 10px;
+                    position: relative;
+
+                    @include responsive(350) {
+                        width: 250px;
+                        margin: auto;
+                    }
+
+                    @include responsive(850) {
+                        width: 220px;
+                        margin: auto;
+                    }
+
+                    @include responsive(1050) {
+                        width: 210px;
+                        margin: auto;
+                    }
+
+                    &::before {
+                        @include createEle(10px, 10px);
+                        @include position($t: 10px, $l: 10px);
+                        border-radius: 100%;
+                        background: radial-gradient(circle at 35% 30%, #fff, #d39840);
+                    }
+                }
+            }
+
+            .nav-links {
+                .nav.nav-tabs {
+                    border: none;
+                    flex-wrap: wrap;
+                    overflow: visible;
+                    gap: 6px 10px;
+                    row-gap: 12px;
+
+                    li {
+                        button {
+                            position: relative;
+                            border: 1px solid #f3e8d2;
+                            background-color: #212c3a;
+                            padding: 10px 20px 9px;
+                            height: fit-content;
+                            color: #fff;
+                            transition: all .3s;
+                            font-weight: 600;
+                            font-size: 14px;
+
+
+                            &::before {
+                                @include createEle(7px, 7px);
+                                @include position($t: 5px, $l: 5px);
+                                background: radial-gradient(circle at 35% 30%, #E3B466, #8F672A);
+                                border-radius: 100%;
+                                transition: all .3s;
+                            }
+
+                            &:hover,
+                            &.active {
+                                background-color: #BE8C3E;
+                                color: #000;
+                            }
+
+                            &.active::before,
+                            &:hover::before {
+                                background: radial-gradient(circle at 35% 30%, #fff, #8F672A);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.table-responsive {
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 10px 20px -12px rgba(0, 0, 0, .35);
+
+    @include responsive(350) {
+        overflow: auto;
+    }
+
+    @include responsive(1050) {
+        overflow: hidden;
+    }
+}
+
+.table {
+    color: #2c2013;
+    margin-bottom: 0;
+    background-color: #F3E8D2;
+    border-radius: 4px;
+
+    @include responsive(350) {
+        width: max-content;
+        margin: auto;
+    }
+
+    @include responsive(1050) {
+        width: 100%;
+    }
+
+    thead th {
+        background-color: #1B2430;
+        color: #fff;
+    }
+
+    tbody {
+        tr {
+
+            td,
+            th {
+                background-color: #F3E8D2;
+                border-color: rgba(27, 36, 48, .12);
+                vertical-align: middle;
+            }
+
+            &:nth-child(even) {
+
+                td,
+                th {
+                    background-color: #f1e0b9;
+                }
+            }
+        }
+
+        th.head {
+            color: rgba(#2c2013, .55);
+        }
+    }
+
+}
+
+.badge {
+    @include position($t: 10px, $r: 10px);
+}
+
+.modal-content {
+    background-color: #212c3a;
+    border: 1px solid #f3e8d2;
+    border-radius: 10px;
+    color: #fff;
+
+    .modal-header {
+        button {
+            color: #fff;
+        }
+    }
+
+}
+
+
+.btn-add-author {
+    background-color: #F3E8D2;
+    color: #38331F;
+    font-weight: bold;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    padding: 8px;
+    border-radius: 8px;
+    border: 0;
+    outline: 0;
+
+    &:hover {
+        background-color: #ebc984;
+        color: #38331F;
+    }
+}
+
+
+
+.api-error-banner {
+    font-size: 15px;
+    font-weight: 600;
+}
+
+form {
+    &#BookFilterForm {
+        background-color: #F3E8D2;
+        border-radius: 10px;
+
+        @include responsive(350) {
+            max-width: 320px;
+            margin: auto;
+        }
+
+        @include responsive(650) {
+            max-width: 350px;
+        }
+
+        @include responsive(850) {
+            max-width: initial;
+        }
+    }
+
+    label {
+        font-weight: 700;
+
+        &.input-group-text {
+            border: 1px solid #BE8C3E;
+        }
+    }
+
+    input.form-control,
+    textarea.form-control,
+    #Sort {
+        border: 1px solid #fff;
+
+        &:focus {
+            border-color: #BE8C3E;
+            box-shadow: none;
+        }
+    }
+
+    textarea {
+        resize: none;
+    }
+}
+
+button.save {
+    background-color: #BE8C3E;
+    outline: none;
+    color: #fff;
+    font-size: 15px;
+    font-weight: 700;
+
+    &:hover {
+        background-color: #e09824;
+        color: #fff;
+    }
+
+    &:active.btn {
+        box-shadow: none;
+        color: #fff;
+        outline: none;
+        background-color: #BE8C3E;
+    }
+}
+
+.authBio {
+    height: 50px;
+}
+
+.iconCart {
+    color: #f0990f;
+    background-color: #F3E8D2;
+
+    &:active {
+        background-color: #F3E8D2;
+        box-shadow: none;
+        outline: none;
+    }
+
+    &:hover {
+        background-color: #f8d48a;
+        color: #f0990f;
+    }
+
+    span {
+        background-color: #f0990f;
+        border-radius: 100%;
+        display: block;
+        width: 20px;
+        height: 20px;
+        @include flex(center, center);
+    }
+}
+
+.btnAddCart {
+    border: 1px solid #f0990f;
+    color: #f0990f;
+
+    &:hover {
+        background-color: #f0990f;
+        color: #fff;
+    }
+}
+
+input.form-control {
+    border: 1px solid #fff;
+
+    &:focus {
+        border-color: #BE8C3E;
+        box-shadow: none;
+    }
+}
+
+#Cart,
+#ShowOrder {
+    .modal-dialog {
+        width: 70%;
+        max-width: initial;
+
+        .total {
+            color: #e09824;
+        }
+
+        @include responsive(350) {
+            width: 95%;
+            margin: auto;
+        }
+
+        @include responsive(650) {
+            width: 70%;
+        }
+
+        @include responsive(850) {
+            width: 90%;
+        }
+
+        @include responsive(1050) {
+            width: 95%;
+        }
+
+        @include responsive(1250) {
+            width: 80%;
+        }
+    }
+}
+
+.btn-close {
+    width: 30px;
+    height: 30px;
+    background-color: #e09824;
+    border-radius: 8px;
+}
+
+.btn-plus {
+    color: #e09824;
+    border-color: #e09824;
+
+    &:hover {
+        background-color: #e09824;
+        color: #fff;
+    }
+}
+
+#DeleteItem {
+    width: 40px;
+    height: 40px;
+    background-color: rgb(236, 43, 43);
+    border-radius: 8px;
+    @include flex(center, center);
+    @include position($t: 5px, $r: 5px);
+    color: #fff;
+    cursor: pointer;
+}
+
+button.btn.hideButton {
+    opacity: .3;
+    cursor: none;
+}
+
+.desc {
+    height: 67px;
+
+    p:nth-of-type(2) {
+        font-size: 15px;
+    }
+}

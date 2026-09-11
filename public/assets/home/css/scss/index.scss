@@ -1,0 +1,29 @@
+header {
+    min-height: 80dvh;
+
+    .carousel-indicators {
+        bottom: -100px;
+
+        button[data-bs-target] {
+            width: 10px;
+            height: 10px;
+            border-radius: 100%;
+
+            &.active {
+                background-color: #BE8C3E;
+            }
+        }
+    }
+
+    .carousel-item {
+        .row {
+            .item {
+                img {
+                    width: 500px;
+                    height: 350px;
+                    margin: auto;
+                }
+            }
+        }
+    }
+}
