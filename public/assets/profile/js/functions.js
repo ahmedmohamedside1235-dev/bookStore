@@ -194,7 +194,7 @@ function showBooks(books, dataName) {
     return;
 }
 
-function changePage(pageNumber, sectionName, isFilter) {
+function changePage(pageNumber, sectionName, isFilter = false) {
     let key = isFilter ? `${sectionName}Filter` : sectionName;
     if (pageNumber === currentPages[key]) {
         return;
@@ -203,18 +203,20 @@ function changePage(pageNumber, sectionName, isFilter) {
 
     if (isFilter)
         getFilterPaginationBooks(pageNumber);
-    else
-        getDataRow(sectionName);
+    else {
+        (authRole == 'customer' && sectionName != 'Books') ? getDataRow(sectionName, null, true) : getDataRow(sectionName);
+    }
 }
 
 // pagination data 
-function getDataRow(paginationName, page = null) {
+function getDataRow(paginationName, page = null, except = false) {
     $.ajax({
         url: `profile/getData`,
         type: "POST",
         data: {
             "typeData": paginationName,
-            "pageNumber": page ?? currentPages[paginationName]
+            "pageNumber": page ?? currentPages[paginationName],
+            "except": except
         },
         success: function (response) {
             let data = response.data;
@@ -288,7 +290,7 @@ function showAlert(status, msg) {
 }
 
 function imagePath(imageName, isUpload) {
-    return window.location.origin + `/bookStore/public/assets/images${isUpload ? '/uploads/' : '/'}${imageName}`;
+    return window.location.origin + `/assets/images${isUpload ? '/uploads/' : '/'}${imageName}`;
 }
 
 function showErrorAdd(errors) {
@@ -415,8 +417,8 @@ function toggleBanUser(btn, userId, text) {
 }
 
 function getPathLinkPage(linkName) {
-    console.log(window.location.origin + "/bookStore/public/" + linkName);
-    return window.location.origin + "/bookStore/public/" + linkName;
+    console.log(window.location.origin + linkName);
+    return window.location.origin + linkName;
 }
 
 function addToCart(bookId, btn) {
@@ -555,7 +557,7 @@ function bookComponent(book, status = "main", authRole = 'admin') {
             <div class='item position-relative cardUser mb-3 py-4 px-2'>
                 ${status == 'cart' ? `<i class="fa-solid fa-trash-can" id='DeleteItem' onclick="deleteOrderItem(${book['orders_items_id']} , this)"></i>` : ''}
                 <div class='head text-center mb-4'>
-                    <img src='${imagePath('book.png')}' class='imgUser d-block m-auto'
+                    <img src='${book['image'] == null ? imagePath('book.png') : imagePath(book['image'], true)}' class='imgUser d-block m-auto'
                         alt=''>
                     <h6 class='mt-3'>${book['title']}</h6>
                 </div>
@@ -712,7 +714,7 @@ function orderNow(orderId, btn) {
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: `Yes, delete it!`
+        confirmButtonText: `Yes, Order it!`
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
@@ -807,7 +809,7 @@ function changeStatusOfOrder(orderId, status, cancelReson = null) {
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: `Yes, delete it!`
+        confirmButtonText: `Yes, ${status} it!`
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
@@ -818,8 +820,8 @@ function changeStatusOfOrder(orderId, status, cancelReson = null) {
                     console.log(response);
                     $(`tr[data-order-id='${orderId}'] button`).prop('disabled', false).removeClass('hideButton');
                     showAlert('success', `The Order has been ${status} successfully.`)
-                    getDataRow('Orders_ordered');
-                    getDataRow(`Orders_${status}`);
+                    getDataRow('Orders_ordered', 1, true);
+                    getDataRow(`Orders_${status}`, 1, true);
                     toggleModal('CanceledReason');
                     $('#CanceledReason textarea').val("");
                 },

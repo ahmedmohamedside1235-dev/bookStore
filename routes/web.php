@@ -13,7 +13,7 @@ require_once __DIR__ . "/../app/middlewares/AuthMiddleware.php";
 require_once __DIR__ . "/../app/middlewares/GuestMiddleware.php";
 require_once __DIR__ . "/../app/middlewares/RegisterMiddleware.php";
 
-Route::get("", HomeController::class, "index");
+Route::get("/", HomeController::class, "index");
 
 Route::get("/auth/login", loginController::class, "index", [GuestMiddleware::class]);
 Route::post("/auth/login", loginController::class, "login");

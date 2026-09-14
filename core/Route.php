@@ -1,4 +1,3 @@
-
 <?php
 
 class Route
@@ -39,7 +38,11 @@ class Route
     public static function  dispatch()
     {
         $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-        $url = rtrim($url, '/');
+
+        if ($url !== '/') {
+            $url = rtrim($url, '/');
+        }
+
         $method = $_SERVER['REQUEST_METHOD'];
         $flag = false;
         foreach (self::$routes as $route) {

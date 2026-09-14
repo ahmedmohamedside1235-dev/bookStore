@@ -30,9 +30,9 @@ class validation
                     }
                 } else if (is_array($rule)) {
                     if ($rule[0] === "min") {
-                        $this->validateMin($field, $value);
+                        $this->validateMin($field, $value, $rule[1]);
                     } else if ($rule[0] === "unique") {
-                        $this->validateUnique($field, $value, $rule[1], $rule[2]);
+                        $this->validateUnique($field, $value, $rule[1], $rule[2] ?? null);
                     } else if ($rule[0] === "exists") {
                         $this->validateExists($field, $value, $rule[1], $rule[2]);
                     }

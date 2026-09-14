@@ -22,12 +22,12 @@ class loginController extends controller
 
         $data = AuthModel::login();
 
-        if ($data['is_banned']) {
-            $_SESSION['_old'] = [];
-            back('bannedAccount', "Your Account is banned from admin");
-        }
-
         if ($data != false) {
+            if ($data['is_banned']) {
+                $_SESSION['_old'] = [];
+                back('bannedAccount', "Your Account is banned from admin");
+            }
+
             session_regenerate_id(true);
             $_SESSION['user'] = $data;
             $_SESSION['_old'] = [];

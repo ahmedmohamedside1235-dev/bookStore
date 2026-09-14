@@ -63,6 +63,8 @@
 
     <script src="<?= asset('shared/script/bootstrap.js') ?>"></script>
     <script src="<?= asset('shared/script/jquery.js') ?>"></script>
+    <script src="<?= asset('shared/script/activeNavLinks.js') ?>"></script>
+
 </body>
 
 </html>

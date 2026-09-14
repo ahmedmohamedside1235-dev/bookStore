@@ -153,8 +153,8 @@ function showDropDownLi()
                         {$userName}
                     </a>
                     <ul class='dropdown-menu'>
-                    <li><a class='dropdown-item' href='{$profileLink}'>profile</a></li>
-                    <li><a class='dropdown-item' href='{$registerLink}'>Create New Admin</a></li>
+                    <li><a class='dropdown-item Profile' href='{$profileLink}'>Profile</a></li>
+                    <li><a class='dropdown-item Register' href='{$registerLink}'>Create New Admin</a></li>
                     <li><a class='dropdown-item' href='{$logoutLink}'>Logout</a></li>
                     </ul>
                 </li>
@@ -167,7 +167,7 @@ function showDropDownLi()
                         {$userName}
                     </a>
                     <ul class='dropdown-menu'>
-                    <li><a class='dropdown-item' href='{$profileLink}'>profile</a></li>
+                    <li><a class='dropdown-item Profile' href='{$profileLink}'>Profile</a></li>
                     <li><a class='dropdown-item' href='{$logoutLink}'>Logout</a></li>
                     </ul>
                 </li>
@@ -179,8 +179,8 @@ function showDropDownLi()
                         Account
                     </a>
                     <ul class='dropdown-menu'>
-                        <li><a class='dropdown-item' href='{$loginLink}'>Login</a></li>
-                        <li><a class='dropdown-item' href='{$registerLink}'>Register</a></li>
+                        <li><a class='dropdown-item Login' href='{$loginLink}'>Login</a></li>
+                        <li><a class='dropdown-item Register' href='{$registerLink}'>Register</a></li>
                     </ul>
                 </li>
             ";
@@ -341,7 +341,7 @@ function showBooks(array $books)
     $htmlBooks = "";
 
     foreach ($books as $book) {
-        $image = asset("images/book.png");
+        $image = $book['image'] == null ? asset("images/book.png") : asset("images/uploads/{$book['image']}");
         $shortDesc = substr($book['description'], 0, 60);
         $additionFeature = "";
 

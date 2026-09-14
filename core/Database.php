@@ -2,9 +2,9 @@
 
 class Database
 {
-    private const DSN = "mysql:host=localhost;dbname=bookStore";
-    private const USERNANE = "root";
-    private const PASSWORD = "";
+    private const DSN = "mysql:host=fdb1028.awardspace.net;dbname=4788996_bookstore";
+    private const USERNANE = "4788996_bookstore";
+    private const PASSWORD = "Ahmed@25";
     private static ?PDO $connection = null;
 
 

@@ -116,6 +116,15 @@ class profileController extends controller
 
     public function getData()
     {
+        $errors = Request::validate([
+            'typeData' => ['required'],
+            'except' => ['required']
+        ]);
+
+        if (!empty($errors)) {
+            Response::json($errors, status: 422);
+        }
+
         $pageNumber = (int)(Request::input('pageNumber', 1));
         $type = Request::input('typeData', 'Admins');
 
@@ -127,26 +136,6 @@ class profileController extends controller
             'Orders_ordered'   => $this->getOrders('ordered', $pageNumber),
             'Orders_canceled'  => $this->getOrders('canceled', $pageNumber),
             'Orders_done'      => $this->getOrders('done', $pageNumber),
-            default            => null,
-        };
-
-        if ($data === null) {
-            return Response::json(null, 'Invalid typeData');
-        }
-
-        Response::json($data, 'successfully');
-    }
-    public function editUser()
-    {
-        $pageNumber = (int)(Request::input('pageNumber', 1));
-        $type = Request::input('inputName', 'Admins');
-
-        $data = match ($type) {
-            'name'           => $this->getAdmins($pageNumber),
-            'email'        => $this->getCustomers($pageNumber),
-            'phone'            => $this->getBooks($pageNumber),
-            'gender'          => $this->getAuthors($pageNumber),
-            'password'   => $this->getOrders('ordered', $pageNumber),
             default            => null,
         };
 
@@ -191,6 +180,14 @@ class profileController extends controller
 
     public function getOrders(string $status, int $page)
     {
-        return ["Orders_{$status}" => OrderModel::getDataOfOrders([['status', '=', $status]], $page)];
+        $rules = [['status', '=', $status]];
+        $except = Request::input('except');
+        $except = filter_var($except, FILTER_VALIDATE_BOOLEAN);
+
+        if ($except) {
+            $rules[] = ['customer_id', '=', auth('id')];
+        }
+
+        return ["Orders_{$status}" => OrderModel::getDataOfOrders($rules, $page)];
     }
 }

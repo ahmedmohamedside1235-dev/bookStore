@@ -75,7 +75,7 @@
 
                         <!--* Content Navs-->
                         <?php if (isAuth('admin')) {
-                            require_once __DIR__ . "/components/admin_Content.php";
+                            require_once __DIR__ . "/components/admin_content.php";
                         } elseif (isAuth('customer')) {
                             require_once __DIR__ . "/components/customer_content.php";
                         } ?>
@@ -90,12 +90,13 @@
     <script src="<?= asset('shared/script/bootstrap.js') ?>"></script>
     <script src="<?= asset('shared/script/jquery.js') ?>"></script>
     <script src="<?= asset('shared/script/sweetalert.js') ?>"></script>
+    <script src="<?= asset('shared/script/activeNavLinks.js') ?>"></script>
     <script>
         const authId = <?= auth('id') ?>;
         const authRole = "<?= auth('role') ?>";
     </script>
-    <script src="<?= asset('Profile/js/functions.js') ?>"></script>
-    <script src="<?= asset('Profile/js/profile.js') ?>"></script>
+    <script src="<?= asset('profile/js/functions.js') ?>"></script>
+    <script src="<?= asset('profile/js/profile.js') ?>"></script>
 
 </body>
 
