@@ -820,8 +820,8 @@ function changeStatusOfOrder(orderId, status, cancelReson = null) {
                     console.log(response);
                     $(`tr[data-order-id='${orderId}'] button`).prop('disabled', false).removeClass('hideButton');
                     showAlert('success', `The Order has been ${status} successfully.`)
-                    getDataRow('Orders_ordered', 1, true);
-                    getDataRow(`Orders_${status}`, 1, true);
+                    getDataRow('Orders_ordered', 1);
+                    getDataRow(`Orders_${status}`, 1);
                     toggleModal('CanceledReason');
                     $('#CanceledReason textarea').val("");
                 },
