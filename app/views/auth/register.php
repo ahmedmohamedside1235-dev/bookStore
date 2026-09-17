@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
+    <link rel="stylesheet" href="<?= asset('shared/styles/css/all.min.css') ?>">
     <link rel="stylesheet" href="<?= asset('shared/styles/css/bootstrap.css') ?>">
     <link rel="stylesheet" href="<?= asset('shared/styles/global/global.css') ?>">
     <link rel="stylesheet" href="<?= asset('auth/register/css/register.css') ?>">
@@ -39,7 +40,10 @@
                 </div>
                 <div class="mb-4">
                     <label for="Password" class="form-label">Password :</label>
-                    <input type="password" class="form-control" value="<?= old('password') ?>" name="password" id="Password" placeholder="••••••••">
+                    <div class="password_icon position-relative">
+                        <i class="fa-solid fa-eye" onclick="togglePassword(this)"></i>
+                        <input type="password" class="form-control" value="<?= old('password') ?>" name="password" id="Password" placeholder="••••••••">
+                    </div>
                     <?= showError('password') ?>
                 </div>
                 <div class="mb-4">
@@ -64,6 +68,7 @@
     <script src="<?= asset('shared/script/bootstrap.js') ?>"></script>
     <script src="<?= asset('shared/script/jquery.js') ?>"></script>
     <script src="<?= asset('shared/script/activeNavLinks.js') ?>"></script>
+
 
 </body>
 

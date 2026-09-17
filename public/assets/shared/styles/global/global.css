@@ -265,4 +265,16 @@ nav.navbar .navbar-nav .nav-item button.btn:hover {
   justify-content: center;
 }
 
+.password_icon i {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  bottom: initial;
+  left: initial;
+  z-index: 10;
+  transform: translateY(-50%);
+  color: #CB9E55;
+  cursor: pointer;
+}
+
 /*# sourceMappingURL=global.css.map */

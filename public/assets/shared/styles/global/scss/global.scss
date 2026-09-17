@@ -277,3 +277,12 @@ nav.navbar {
         justify-content: center;
     }
 }
+
+.password_icon {
+    i {
+        @include position($t: 50%, $r: 10px, $z: 10);
+        transform: translateY(-50%);
+        color: #CB9E55;
+        cursor: pointer;
+    }
+}

@@ -17,3 +17,10 @@ $(document).ready(function () {
     currentItem.addClass('active');
     currentItem.closest('.dropdown').find('.dropdown-toggle').addClass('active');
 });
+
+function togglePassword(icon) {
+    let input = $(icon).parent().find('input');
+    let isPassword = input.attr('type') === 'password';
+    input.attr('type', isPassword ? 'text' : 'password');
+    $(icon).toggleClass('fa-eye', !isPassword).toggleClass('fa-eye-slash', isPassword);
+}
