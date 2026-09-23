@@ -243,7 +243,7 @@ class OrderModel extends Model
 
             $orderItem = $stmt->fetch();
 
-            if ($orderItem['quantity'] == 0 && $operation == '-')
+            if ($orderItem['quantity'] <= 0 && $operation == '-')
                 self::deleteOrderItems();
 
             $totalPrice = self::updateTotalPriceOfOrder();

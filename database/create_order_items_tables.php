@@ -5,7 +5,7 @@ class create_order_items_tables
 {
     public static function up()
     {
-        Database::getConnection()->exec("CREATE TABLE IF NOT EXISTS order_items(
+        Database::getConnection()->exec("CREATE TABLE IF NOT EXISTS orders_items(
                     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
                     order_id BIGINT UNSIGNED NOT NULL,
                     CONSTRAINT fk_order_id FOREIGN KEY (order_id) REFERENCES orders(id),
