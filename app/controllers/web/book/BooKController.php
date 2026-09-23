@@ -16,7 +16,7 @@ class BooKController extends controller
         $where = [
             ['authors.name', 'LIKE', "%" . Request::input('author', '') . "%"],
             ['books.title', 'LIKE', '%' . Request::input('title', '') . '%'],
-            ['books.price', ">", $minPrice],
+            ['books.price', ">=", $minPrice],
         ];
 
 

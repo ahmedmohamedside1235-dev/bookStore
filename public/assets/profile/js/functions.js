@@ -423,7 +423,8 @@ function getPathLinkPage(linkName) {
 
 function addToCart(bookId, btn) {
     let input = $(btn).prev(),
-        inputValue = input.val();
+        inputValue = input.val(),
+        stock = Number($(`#Books .StockBook-${bookId}`).text());
     $(btn).prop('disabled', true);
 
     if (inputValue === '' || inputValue == 0) {
@@ -445,10 +446,12 @@ function addToCart(bookId, btn) {
             input.val("");
             $("#NumberOfOrders").text(response.data.totalItmesOrders);
             showAlert('success', response.message);
+            $(`#Books .StockBook-${bookId}`).text(stock - inputValue);
             $(btn).prop('disabled', false);
         },
         error: function (response) {
             $(btn).prop('disabled', false);
+            input.val("");
             if (response.responseJSON?.data) {
                 showAlert('error', response.responseJSON.data.quantity[0]);
             } else {
@@ -511,7 +514,7 @@ function bookComponent(book, status = "main", authRole = 'admin') {
                 `<div class='col-12'>
                     <div class='item d-flex align-items-center'>
                         <p class='me-2 mb-0 label'>Stock :</p>
-                        <p class='mb-0'>${book['stock']}</p>
+                        <p class='mb-0 StockBook-${book['id']}'>${book['stock']}</p>
                     </div>
                 </div>`
                 + (authRole === 'customer' ?
@@ -531,10 +534,22 @@ function bookComponent(book, status = "main", authRole = 'admin') {
                             <p class='mb-0 subtotal-${book['orders_items_id']}'>${book['subtotal']}</p>
                         </div>
                     </div>
+                    <div class='col-12'>
+                        <div class='item d-flex align-items-center mb-3'>
+                            <p class='me-2 mb-0 label'>Stock :</p>
+                            <p class='mb-0 StockBook-${book['book_id']}'>${book['stock']}</p>
+                        </div>
+                    </div>
                     <div class="input-group w-75 m-auto">
-                        <button onclick="changeQuantity(${book['orders_items_id']} , 'decrease', this)" class="btn btn-outline-danger"><i class="fa-solid fa-minus"></i></button>
+                        <button class="btn btn-outline-danger btn-minus" ${book['quantity'] <= 0 ? 'disabled' : ''}
+                            onclick="changeQuantity(${book['orders_items_id']}, this, ${book['book_id']})">
+                            <i class="fa-solid fa-minus"></i>
+                        </button>
                         <input type="text" disabled class="form-control text-center quatity-${book['orders_items_id']}" value='${book['quantity']}'>
-                        <button onclick="changeQuantity(${book['orders_items_id']} , 'increase', this)" class="btn btn-plus"><i class="fa-solid fa-plus"></i></button>
+                        <button class="btn btn-plus ${book['stock'] == 0 ? 'hideButton' : ''}" ${book['stock'] == 0 ? 'disabled' : ''}
+                            onclick="changeQuantity(${book['orders_items_id']}, this, ${book['book_id']})">
+                            <i class="fa-solid fa-plus"></i>
+                        </button>
                     </div>`,
 
             showOrder: `<div class='col-12'>
@@ -555,7 +570,7 @@ function bookComponent(book, status = "main", authRole = 'admin') {
     return `
         <div class='col-md-6 col-lg-4 itemCard'>
             <div class='item position-relative cardUser mb-3 py-4 px-2'>
-                ${status == 'cart' ? `<i class="fa-solid fa-trash-can" id='DeleteItem' onclick="deleteOrderItem(${book['orders_items_id']} , this)"></i>` : ''}
+                ${status == 'cart' ? `<i class="fa-solid fa-trash-can" id='DeleteItem' onclick="deleteOrderItem(${book['orders_items_id']} , this , ${book['book_id']})"></i>` : ''}
                 <div class='head text-center mb-4'>
                     <img src='${book['image'] == null ? imagePath('book.png') : imagePath(book['image'], true)}' class='imgUser d-block m-auto'
                         alt=''>
@@ -592,34 +607,47 @@ function bookComponent(book, status = "main", authRole = 'admin') {
 function toggleModal(modalId, status = 'hide') {
     let modalEl = document.querySelector(`#${modalId}`),
         modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl);
+    document?.activeElement?.blur();
     if (status == 'hide') {
         modalInstance.hide();
         return;
     }
     modalInstance.show();
+
 }
 
-function changeQuantity(orderItemId, type, btn) {
-    if (type != 'increase' && type != 'decrease') {
-        showAlert('error', 'This action is forbidden. Unauthorized modification detected.');
+function changeQuantity(orderItemId, btn, bookId) {
+    let isPlusBtn = btn.classList.contains('btn-plus'),
+        type = isPlusBtn ? 'increase' : 'decrease',
+        operation = type == 'increase' ? '+' : '-';
+
+    let $buttons = $(btn).closest('.itemCard').find('button');
+    $buttons.prop('disabled', true).addClass('hideButton');
+
+    if (!checkQuantity(orderItemId, bookId, type)) {
+        showAlert('error', 'The quantity not valid now');
+        $buttons.prop('disabled', false).removeClass('hideButton');
         return;
     }
 
-    $('#Cart .modal-body button').prop('disabled', true).addClass('hideButton');
-
     let data = {
         orderItemId: orderItemId,
-        typeAction: type
-    }
+        typeAction: type,
+        book_id: bookId
+    };
 
     $.ajax({
         url: "profile/changeQuantity",
         type: "POST",
         data: data,
         success: (response) => {
-            $('#Cart .modal-body button').prop('disabled', false).removeClass('hideButton');
+            $buttons.prop('disabled', false).removeClass('hideButton');
             let data = response.data,
-                orderItem = data.orderItem;
+                orderItem = data.orderItem,
+                stock = Number($(`#Cart .StockBook-${bookId}`).text());
+
+            updateStock(type, bookId, stock);
+            checkQuantity(orderItemId, bookId, type);
 
             if (orderItem.quantity == 0) {
                 btn.closest('.itemCard').remove();
@@ -627,11 +655,10 @@ function changeQuantity(orderItemId, type, btn) {
 
                 if (data.totalOrderIntoCart == 0) {
                     $('#Cart .modal-body').html(`
-                        <p class="alert alert-warning text-center w-100"> Your cart is empty. Add some books to your cart first.</p>
+                        <p class="alert alert-warning text-center w-100">Your cart is empty. Add some books to your cart first.</p>
                     `);
                     return;
                 }
-
             } else {
                 $(`.subtotal-${orderItem['id']}`).text(orderItem['subtotal']);
                 $(`input.quatity-${orderItem['id']}`).val(orderItem['quantity']);
@@ -640,22 +667,74 @@ function changeQuantity(orderItemId, type, btn) {
             $('#TotalPrice').text(data.totalPrice);
         },
         error: (response) => {
-            $('#Cart .modal-body button').prop('disabled', false).removeClass('hideButton');
+            $buttons.prop('disabled', false).removeClass('hideButton');
             if (response.responseJSON?.data) {
                 showAlert('error', Object.values(response.responseJSON.data)[0][0]);
             } else {
-                showAlert('error', response.responseJSON.message);
+                showAlert('error', response.responseJSON?.message ?? 'Something went wrong');
             }
         },
-    })
+    });
 }
 
-function deleteOrderItem(orderItemId, btn) {
-    let data = {
-        orderItemId: orderItemId
+function updateStock(type, bookId, stock) {
+    if (type == 'increase') {
+        $(`#Cart .StockBook-${bookId}`).text(stock - 1);
+        $(`#Books .StockBook-${bookId}`).text(stock - 1);
+    } else {
+        $(`#Cart .StockBook-${bookId}`).text(stock + 1)
+        $(`#Books .StockBook-${bookId}`).text(stock + 1)
+    }
+}
+function checkQuantity(orderItemId, bookId, type) {
+    let $itemCard = $(`input.quatity-${orderItemId}`).closest('.itemCard'),
+        $plusBtn = $itemCard.find('.btn-plus'),
+        $minusBtn = $itemCard.find('.btn-minus'),
+        stock = Number($(`#Cart .StockBook-${bookId}`).text()),
+        quantity = Number($(`input.quatity-${orderItemId}`).val());
+
+    if (isNaN(stock) || isNaN(quantity)) {
+        return false;
     }
 
-    $(btn).prop('disabled', true).addClass('hideButton');
+    if (type === 'increase') {
+        if (stock <= 0) {
+            $plusBtn.prop('disabled', true).addClass('hideButton');
+            return false;
+        }
+
+        if (stock >= 1) {
+            $plusBtn.prop('disabled', false).removeClass('hideButton');
+        }
+
+        return true;
+    }
+
+    if (type === 'decrease') {
+
+        if (quantity < 0) {
+            $minusBtn.prop('disabled', true).addClass('hideButton');
+            return false;
+        }
+
+        if (quantity <= 0) {
+            $minusBtn.prop('disabled', true).addClass('hideButton');
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+function deleteOrderItem(orderItemId, btn, bookId) {
+    let data = {
+        orderItemId: orderItemId,
+        book_id: bookId
+    }
+
+    let $buttons = $('#Cart .modal-body').find('.itemCard').find('button');
+    $buttons.prop('disabled', true).addClass('hideButton');
 
     Swal.fire({
         title: "Are you sure?",
@@ -678,16 +757,17 @@ function deleteOrderItem(orderItemId, btn) {
                     showAlert('success', "The book has been deleted successfully.");
                     if (data.totalOrderIntoCart == 0) {
                         $('#Cart .modal-body').html(`
-                    <p class="alert alert-warning text-center w-100"> Your cart is empty. Add some books to your cart first.</p>
-                `);
+                            <p class="alert alert-warning text-center w-100"> Your cart is empty. Add some books to your cart first.</p>
+                        `);
                     } else {
                         $('#TotalPrice').text(data.totalPrice);
                     }
 
+                    $(`#Books .StockBook-${bookId}`).text(data.stock);
                     $('#NumberOfOrders').text(data.totalOrderIntoCart);
                 },
                 error: (response) => {
-                    $('#Cart .modal-body button').prop('disabled', false).removeClass('hideButton');
+                    $buttons.prop('disabled', false).removeClass('hideButton');
                     if (response.responseJSON?.data) {
                         showAlert('error', Object.values(response.responseJSON.data)[0][0]);
                     } else {
@@ -735,7 +815,7 @@ function orderNow(orderId, btn) {
                     $(`.totalBoughtBooks`).text(response.data.boughtBooks);
                 },
                 error: (response) => {
-                    $('#Cart .modal-body button').prop('disabled', false).removeClass('hideButton');
+                    $(btn).prop('disabled', false).removeClass('hideButton');
                     if (response.responseJSON?.data) {
                         showAlert('error', Object.values(response.responseJSON.data)[0][0]);
                     } else {

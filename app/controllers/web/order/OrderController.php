@@ -18,6 +18,10 @@ class OrderController extends controller
             Response::json($errors, status: 422);
         }
 
+        if (!OrderModel::checkValidStock()) {
+            Response::json(null, 'The quantity is not valid now', 403);
+        }
+
         $totalOrders = OrderModel::orderBook();
         Response::json([
             'totalItmesOrders' => $totalOrders
@@ -46,6 +50,7 @@ class OrderController extends controller
         $errors = Request::validate([
             'orderItemId' => ['required', ['exists', 'orders_items', 'id']],
             'typeAction' => ['required'],
+            'book_id' => ['required'],
         ]);
 
         if (!empty($errors)) {
@@ -71,6 +76,7 @@ class OrderController extends controller
     {
         $errors = Request::validate([
             'orderItemId' => ['required', ['exists', 'orders_items', 'id']],
+            'book_id' => ['required', ['exists', 'books', 'id']],
         ]);
 
         if (!empty($errors)) {

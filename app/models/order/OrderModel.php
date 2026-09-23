@@ -107,6 +107,7 @@ class OrderModel extends Model
                         ");
         }
 
+        self::updateStock('-', $quantity);
         self::updateTotalPriceOfOrder();
         return self::totalItmesIntoOrder();
     }
@@ -128,6 +129,7 @@ class OrderModel extends Model
                                 books.image,
                                 books.description,
                                 books.price,
+                                books.stock,
                                 authors.id AS author_id,
                                 authors.name AS author_name,
                                 orders.id AS order_id,
@@ -145,39 +147,128 @@ class OrderModel extends Model
         return $items;
     }
 
+    public static function checkValidStock(?string $quantityValue = null): bool
+    {
+        $DB = Database::getConnection();
+        $stmt = $DB->prepare('SELECT stock FROM books WHERE id = :bookId');
+        $stmt->execute([
+            'bookId' => Request::input('book_id')
+        ]);
+
+        $stock = $stmt->fetchColumn();
+
+        if ($stock === false) {
+            return false;
+        }
+
+        $quantity = Request::input('quantity', $quantityValue);
+
+        if ($quantity === null || !is_numeric($quantity) || (int)$quantity <= 0) {
+            return false;
+        }
+
+        return (int)$stock >= (int)$quantity;
+    }
+
+    public static function checkIsStockEmpty(): bool
+    {
+        $DB = Database::getConnection();
+        $stmt = $DB->prepare('SELECT stock FROM books WHERE id = :bookId');
+        $stmt->execute([
+            'bookId' => Request::input('book_id')
+        ]);
+
+        $stock = $stmt->fetchColumn();
+
+        if ($stock === false) {
+            return false;
+        }
+
+        return (int)$stock <= 0;
+    }
+
+    public static function updateStock(string $operationStock, int $value = 1)
+    {
+        $DB = Database::getConnection();
+        $stmt = $DB->prepare("UPDATE books SET stock = stock {$operationStock} {$value} WHERE id = :bookId");
+        $stmt->execute([
+            'bookId' => Request::input('book_id')
+        ]);
+
+        $stmt = $DB->prepare("SELECT stock FROM books WHERE id = :bookId;");
+        $stmt->execute([
+            "bookId" => Request::input('book_id'),
+        ]);
+
+        return $stmt->fetchColumn();
+    }
+
     public static function changeQuantity(string $operation)
     {
         $DB = Database::getConnection();
-        $stmt = $DB->prepare("UPDATE orders_items 
+        $bool = true;
+
+        // check stock before increase quantity
+        if ($operation == '+') {
+            $stmt = $DB->prepare("SELECT * FROM orders_items WHERE id = :orderItemId;");
+            $stmt->execute([
+                "orderItemId" => Request::input('orderItemId'),
+            ]);
+
+            $orderItem = $stmt->fetch();
+
+            $bool = !self::checkIsStockEmpty();
+        }
+
+        // if stock is valid
+        if ($bool != false) {
+            $operationStock = ($operation == '+') ? '-' : '+';
+
+            // update stock 
+            self::updateStock($operationStock);
+
+            $stmt = $DB->prepare("UPDATE orders_items 
                                 SET 
                                     quantity = quantity {$operation} 1,
                                     subtotal = subtotal {$operation} unit_price
                                 WHERE id = :orderItemId;");
-        $stmt->execute([
-            "orderItemId" => Request::input('orderItemId'),
-        ]);
+            $stmt->execute([
+                "orderItemId" => Request::input('orderItemId'),
+            ]);
 
-        $stmt = $DB->prepare("SELECT * FROM orders_items WHERE id = :orderItemId;");
-        $stmt->execute([
-            "orderItemId" => Request::input('orderItemId'),
-        ]);
+            $stmt = $DB->prepare("SELECT * FROM orders_items WHERE id = :orderItemId;");
+            $stmt->execute([
+                "orderItemId" => Request::input('orderItemId'),
+            ]);
 
-        $orderItem = $stmt->fetch();
+            $orderItem = $stmt->fetch();
 
-        if ($orderItem['quantity'] == 0 && $operation == '-')
-            self::deleteOrderItems();
+            if ($orderItem['quantity'] == 0 && $operation == '-')
+                self::deleteOrderItems();
 
-        $totalPrice = self::updateTotalPriceOfOrder();
-        return [
-            "orderItem" => $orderItem,
-            "totalPrice" => $totalPrice,
-            "totalOrderIntoCart" => self::totalItmesIntoOrder()
-        ];
+            $totalPrice = self::updateTotalPriceOfOrder();
+            return [
+                "orderItem" => $orderItem,
+                "totalPrice" => $totalPrice,
+                "totalOrderIntoCart" => self::totalItmesIntoOrder()
+            ];
+        } else {
+            Response::json(null, 'The Quantity is not valid', 403);
+        }
     }
 
     public static function deleteOrderItems()
     {
         $DB = Database::getConnection();
+        $stmt = $DB->prepare("SELECT quantity FROM orders_items WHERE id = :orderItemId;");
+        $stmt->execute([
+            "orderItemId" => Request::input('orderItemId'),
+        ]);
+
+        $quantity = $stmt->fetchColumn();
+
+        $stock = self::updateStock('+', $quantity);
+
         $stmt = $DB->prepare("DELETE FROM orders_items WHERE id = :orderItemId;");
         $stmt->execute([
             "orderItemId" => Request::input('orderItemId'),
@@ -185,7 +276,8 @@ class OrderModel extends Model
 
         return [
             "totalOrderIntoCart" => self::totalItmesIntoOrder(),
-            "totalPrice" => self::updateTotalPriceOfOrder()
+            "totalPrice" => self::updateTotalPriceOfOrder(),
+            "stock" => $stock,
         ];
     }
 

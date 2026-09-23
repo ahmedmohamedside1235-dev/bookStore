@@ -388,7 +388,7 @@ function showBooks(array $books)
                             <div class='col-12'>
                                 <div class='item d-flex align-items-center'>
                                     <p class='me-2 mb-0 label'>Stock :</p>
-                                    <p class='mb-0'>{$book['stock']}</p>
+                                    <p class='mb-0 StockBook-{$book['id']}'>{$book['stock']}</p>
                                 </div>
                             </div>
                             {$additionFeature}
