@@ -39,7 +39,7 @@ class Route
     {
         $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
-        if ($url !== '/') {
+        if ($url !== BASE_URL . '/') {
             $url = rtrim($url, '/');
         }
 
