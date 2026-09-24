@@ -21,7 +21,7 @@ class BooKController extends controller
 
 
         if ($maxPrice != null) {
-            array_push($where, ['books.price', "<", $maxPrice]);
+            array_push($where, ['books.price', "<=", $maxPrice]);
         }
 
         if ($stock != null) {
