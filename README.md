@@ -510,20 +510,6 @@ Add screenshots of:
 - Admin Dashboard
 ```
 
----
-
-## 🔗 Links
-
-### GitHub
-
-[GitHub Repository](YOUR_GITHUB_REPOSITORY_LINK)
-
-### Live Project
-
-[Live Demo](YOUR_LIVE_PROJECT_LINK)
-
----
-
 ## 👨‍💻 Developer
 
 ### Ahmed Mohamed
